@@ -1652,10 +1652,12 @@ def datetime_to_datetime64(ndarray[object] values):
         elif PyDateTime_Check(val):
             if val.tzinfo is not None:
                 if inferred_tz is not None:
-                    if _get_zone(val.tzinfo) != inferred_tz:
-                        raise ValueError('Array must be all same time zone: {} vs inferred {}'.format(_get_zone(val.tzinfo), inferred_tz))
+                    _tz = _get_zone(val.tzinfo)
+                    if _tz != inferred_tz:
+                        raise ValueError('Array must be all same time zone: {} (dst {}) vs inferred {}'.format(_tz, _tz.dst(val), inferred_tz))
                 else:
                     inferred_tz = _get_zone(val.tzinfo)
+                    print('same time zone inferred tz {}'.format(inferred_tz.dst(val)))
 
                 _ts = convert_to_tsobject(val, None, None, 0, 0)
                 iresult[i] = _ts.value
